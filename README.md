@@ -1,4 +1,4 @@
-nuxt-vuetify-momo
+nuxt-vuetify-memo
 =================
 ## 1. 기본 환경 설정 <2>
 ``` bash
@@ -159,7 +159,7 @@ remove(i) {
 ``` javascript
 import Firebase from 'firebase'
 
-const config = '';
+const config = {};
 
 var firebaseApp, db, auth, provider;
 if(!firebaseApp && !Firebase.apps.length) {
@@ -190,6 +190,15 @@ user: {}
 		<img :src="user.photoURL" :alt="user.displayName" />
 	</v-avatar>
 </v-btn>
+```
+3) 로그인 버튼 추가
+``` javascript
+//main 영역의 v-card아래에 추가
+<v-card v-if="!user.uid">
+	<v-btn large  @click="login">
+		Login <v-icon>assignment_ind</v-icon>
+	</v-btn>
+</v-card>
 ```
 ### lib/firebase.js를 default.vue에 import
 ### 로그인/로그아웃 추가
