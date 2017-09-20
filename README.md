@@ -1,5 +1,6 @@
 nuxt-vuetify-memo
 =================
+![완성화면](images/goal.png)
 ## 1. 기본 환경 설정 <2>
 ``` bash
 $ node -v
