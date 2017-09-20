@@ -154,7 +154,7 @@ remove(i) {
 }
 ```
 
-## 4. firebase 실시간 DB 사용 <60>
+## 4. firebase 실시간 DB 사용 <100>
 ### lib/firebase.js 생성
 ``` javascript
 import Firebase from 'firebase'
@@ -194,19 +194,82 @@ user: {}
 3) 로그인 버튼 추가
 ``` javascript
 //main 영역의 v-card아래에 추가
+//원래 있는 v-card에는 v-if="user.uid" 추가
 <v-card v-if="!user.uid">
 	<v-btn large  @click="login">
 		Login <v-icon>assignment_ind</v-icon>
 	</v-btn>
 </v-card>
 ```
-### lib/firebase.js를 default.vue에 import
-### 로그인/로그아웃 추가
-### created 추가
-### save 수정
-### delete 수정
+4) 로그인/로그아웃 method추가
+``` javascript
+//import
+import firebase from '../lib/firebase'
+//method추가
+login() {
+	firebase.auth.signInWithPopup(firebase.provider)
+},
+logout() {
+	this.user = {}
+	firebase.auth.signOut();
+},
+```
+5) 로그인 정보 수신 부분 추가
+``` javascript
+created() {
+	const self = this;
+	firebase.auth.onAuthStateChanged((u)=>{
+		if(!u || !u.uid) return self.user = {};
+		self.user = u;
+	})
+}
+```
+### firebase에서 data 가져오기
+``` javascript
+//기존 items의 sample data 제거
+items: {},
+//create hook에 data 조회 추가
+const key = 'notes/' + self.user.uid
+firebase.db.ref(key).off('value');
+firebase.db.ref(key).orderByKey().on('value', (snapshot)=>{
+	self.items = snapshot.val();
+});
+```
+### firebase에서 저장하기
+``` javascript
+// save method 변경
+save() {
+	if(!this.current.memo) return
+	
+	let key = 'notes/' + this.user.uid;
+	let data;
+	if(!this.current.id) {
+		const id = moment().format('YYYYMMDDHHmmssSSS')
+		key += '/' + id
+		data = {
+			"icon":"label",
+			"id":id,
+			"memo":this.current.memo,
+			"datetime": moment().format('YYYY.MM.DD HH:mm:ss')
+		}
+	}else {
+		key += '/' + this.current.id
+	}
+	firebase.db.ref(key).set(data || this.current);
+	this.reset()
+}
+```
+### firebase에서 삭제하기 
+``` javascript
+// remove method 변경
+remove(i) {
+	let key = 'notes/' + this.user.uid + '/' + i.id
+	firebase.db.ref(key).remove()
+	this.reset()
+}
+```
 
-## 5. firebase function 사용 
+## 5. firebase function 사용 <130>
 ### 설명
 * event가 발생하면 특정 function을 실행한다.
 * event에는 CloudEvent와 HttpsEvent로 구분된다.
@@ -251,6 +314,7 @@ exports.makeUppercase = functions.database.ref('/messages/{pushId}/original').on
 ### firebase 연결 (dist를 연결, function도 선택)
 firebase project에서 function을 초기화한다.
 ``` bash
+# firebase login은 실행했다고 가정
 $ firebase init
 ~~~~~~~~
 ? Which Firebase CLI features do you want to setup for this folder? Press Space to select features, then Enter to confirm your choices.
@@ -305,7 +369,7 @@ const admin 	= require('firebase-admin')
 
 admin.initializeApp(functions.config().firebase);
 
-exports.calendar = functions.https.onRequest((req, res) => {
+exports.select = functions.https.onRequest((req, res) => {
 	if (req.method !== 'GET') {
 		res.status(403).send('Forbidden!');
 		return;
@@ -317,7 +381,10 @@ exports.calendar = functions.https.onRequest((req, res) => {
 		res.status(200).send(JSON.stringify(snapshot.val()));
 	});
 });
+// 생성된 url 호출
+// log 확인
 ```
+
 Google Sheet 사용하기
 - google 개발 console로 이동 [https://console.developers.google.com](https://console.developers.google.com)
 - 프로젝트 선택
@@ -373,6 +440,7 @@ function insertLog(type, uid, id, memo) {
 }
 
 exports.insertLog = insertLog
+//로컬 테스트를 해본다.
 ```
 functions/index.js 수정
 ``` javascript
