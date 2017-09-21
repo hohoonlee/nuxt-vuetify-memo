@@ -1,134 +1,213 @@
 nuxt-vuetify-memo
 =================
+아래와 같은 app을 만드는 codelab
 ![완성화면](images/goal.png)
-## 1. 기본 환경 설정 <2>
+# 1. 기본 환경 설정 <2>
 ``` bash
 $ node -v
 $ npm -v #yarn -v
 $ firebase --version #없으면 npm i -g firebase-tools
 $ vue --version #없으면 npm i -g vue-cli
-# vs code 와 vetur plugin
+# vs code 와 vetur plugin 설치되어 있으면 좋음
 ```
 tip: npm-check가 설치되어 있으면 upgrade를 체크해줌.
+``` bash
+$ npm-check -gu #없으면 npm i -g npm-check
+```
 
-## 2. 프로젝트 생성 (nuxt) <15>
-### nuxtjs + vuetify project 만들기
+# 2. 프로젝트 생성 (nuxt) <15>
+## > nuxtjs + vuetify project 만들기
 vue-cli를 사용하여 [Nuxt.js](https://ko.nuxtjs.org) + [Vuetify.js](https://vuetifyjs.com/) 를 생성한다.
+(이 예제에서는 route, store등의 기능을 사용하지 않는다.)
+
+아래 명령어를 실행하여 프로젝트 생성 및 기본 화면을 확인한다.
 ``` bash
 $ vue init vuetifyjs/nuxt memo-project
+# project name, project description, Author는 자유롭게 입력. 
 $ cd memo-project
-$ code .
-# package.json에서 version을 latest로 변경한다.
 $ npm install moment firebase --save # or yarn add moment firebase
 $ npm install # or yarn
 $ npm run dev # or yarn run dev
-# 브라우져 접속 http://localhost:3000
+# 만약 install과정에 오류가 발생하면, package.json에서 version을 latest로 변경해보고 다시 실행해본다.
+# 브라우져 접속 경로 : http://localhost:3000
+```
+![기본페이지](images/default-page.png)
+
+## > nuxt.config.js 수정
+작성자 코딩스타일과 맞지 않아 기본 ESLINT 부분을 제거합니다. (제거 없이 규칙을 수정하거나, 규약에 맞춰 개발할 수도 있습니다.)
+``` javascript
+//if (ctx.dev && ctx.isClient) {
+//	config.module.rules.push({
+//   	enforce: 'pre',
+//        test: /\.(js|vue)$/,
+//        loader: 'eslint-loader',
+//        exclude: /(node_modules)/
+//    })
+//}
 ```
 
-### nuxt.config.js 수정
-ESLINT 부분 제거
-
-### hot deploy test
-layouts/default.vue의 data.title을 '메모앱'으로 변경한다.
-
-## 3. 순수 로컬에서 실행되는 앱 <50>
-
-### default.vue 편집
+# 3. 순수 로컬에서 실행되는 앱 <50>
+## layouts/default.vue 편집 (이 파일 하나에서 모든 동작이 수행됩니다.)
 1) 불필요한 영역 제거
-불필요한 버튼 제거 : line 59 ~ 72, line 26 ~ 44 제거
+``` xml
+// 59라인에서 72라인까지의 아래 소스를 제거한다.
+<v-navigation-drawer
+	temporary
+	:right="right"
+	v-model="rightDrawer"
+>
+	<v-list>
+	<v-list-tile @click="right = !right">
+		<v-list-tile-action>
+		<v-icon light>compare_arrows</v-icon>
+		</v-list-tile-action>
+		<v-list-tile-title>Switch drawer (click me)</v-list-tile-title>
+	</v-list-tile>
+	</v-list>
+</v-navigation-drawer>
+// 26라인에서 44라인까지의 아래 소스를 제거한다.
+<v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+<v-btn
+icon
+@click.stop="miniVariant = !miniVariant"
+>
+	<v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
+</v-btn>
+<v-btn
+icon
+@click.stop="clipped = !clipped"
+>
+	<v-icon>web</v-icon>
+</v-btn>
+<v-btn
+icon
+@click.stop="fixed = !fixed"
+>
+	<v-icon>remove</v-icon>
+</v-btn>
+```
 
 2) 사용할 data format 정의
-``` javascrit
-	clipped: false,
-	drawer: true,
-	fixed: true,
-	items: {
-		aa: {
-			id: 'aa',
-			memo: 'Welcome',
-			icon: 'label',
-			datetime: '2017.09.14 00:00:00'
-		},
-		bb: {
-			id: 'bb',
-			memo: 'Inspire',
-			icon: 'label',
-			datetime: '2017.09.14 00:10:00'
+``` javascript
+// 배열 data 형식을 firebase realtime database처럼 object형태로 변경합니다.
+// 현제 선택된 item을 표현할 current를 추가합니다.
+export default {
+	data() {
+		return {
+			clipped: false,
+			drawer: true,
+			fixed: true,
+			items: {
+				aa: {id: 'aa',	memo: 'Welcome',icon: 'label', datetime: '2017.09.14 00:00:00'},
+				bb: {id: 'bb', memo: 'Inspire',	icon: 'label', datetime: '2017.09.14 00:10:00'}
+			},
+			current:{memo:''},
+			miniVariant: false,
+			title: '메모앱'
 		}
-	},
-	current:{},
-	miniVariant: false,
-	title: '메모앱'
+	}
+}
 ```
 
-3) data 노출 영역 변경
-``` vi
-> v-navigation-drawer에 permanent 추가. (drawer고정)
-> v-list-title의 :to="time.to" 제거.
-> v-list-tile-title의 title을 memo로 변경.
-> 같은 레벨로 <v-list-tile-sub-title v-text="item.datetime"></v-list-tile-sub-title> 추가
+3) 왼쪽 data 목록 영역을 바뀐 items에 맞게 변경.
+``` html
+<!--
+v-navigation-drawer 에 permanent 속성 추가.
+v-list-tile에서 :to="item.to" 제거.
+v-icon에 v-bind:class="{'orange--text':item.id==current.id}" 을 추가해서 선택시 icon생상을 변경한다.
+v-list-tile-title의 item.title을 item.memo로 변경.
+v-list-tile-title 밑에 <v-list-tile-sub-title v-text="item.datetime"></v-list-tile-sub-title> 추가
+-->
+<v-navigation-drawer permanent persistent :mini-variant="miniVariant" :clipped="clipped" v-model="drawer" enable-resize-watcher>
+	<v-list>
+		<v-list-tile v-for="(item, i) in items" :key="i">
+			<v-list-tile-action>
+				<v-icon v-bind:class="{'orange--text':item.id==current.id}" v-html="item.icon"></v-icon>
+			</v-list-tile-action>
+			<v-list-tile-content>
+				<v-list-tile-title v-text="item.memo"></v-list-tile-title>
+				<v-list-tile-sub-title v-text="item.datetime"></v-list-tile-sub-title>
+			</v-list-tile-content>
+		</v-list-tile>
+	</v-list>
+</v-navigation-drawer>
 ```
 
 4) 편집영역 추가
-``` javascript
-//<nuxt />
+``` html
+<!--
+<nuxt />를 제거하고 아래 소스를 추가한다.
+-->
 <v-layout row wrap>
 	<v-flex d-flex xs12>
 		<v-card>
-			<v-text-field
-				placeholder="새로운 메모를 입력해보세요!"
-				full-width
-				rows="15"
-				v-model="current.memo"
-				textarea
-			></v-text-field>
-		
+			<v-text-field placeholder="새로운 메모를 입력해보세요!" full-width rows="15" v-model="current.memo" textarea></v-text-field>
+
 			<v-card-text>
-				<v-btn
-					class="pink"
-					dark
-					absolute
-					bottom
-					right
-					fab
-				>
+				<v-btn class="pink" dark absolute bottom right fab>
 					<v-icon>add</v-icon>
 				</v-btn>
 			</v-card-text>
-		</v-card>	
+		</v-card>
 	</v-flex>
 </v-layout>
 ```
+![중간결과](images/local-step1.png)
 
 5) 상세보기
-``` javascript
-//event 추가 (v-list-title)
-@click.stop.prevent="detail(item)"
-//detail method 생성
-methods: {
-	detail(i) {
-		this.current = i
-	}
-}	
+
+- 왼쪽 영역 클릭시 가운데 편집창에 반영되는 기능을 추가한다. (vue의 bind로 수정도 적용됩니다.)
+``` html
+<!-- v-list-title event 추가 -->
+<v-list-tile v-for="(item, i) in items" :key="i" @click.stop.prevent="detail(item)">
 ```
-6) 새글쓰기
 ``` javascript
-//event 추가 (pink btn에 추가)
-@click="reset"
-//reset method 생성
+//detail method 생성
+export default {
+	data() {
+		~~~생략~~~
+	},
+	methods: {
+		detail(i) {
+			this.current = i
+		}
+	}	
+}
+```
+
+6) 새글쓰기
+
+- 편집창안에 글을 지우고 새글을 받을 준비를 합니다.
+``` html
+<!-- textare 편집창 아래의 pink btn에  event 추가 -->
+<v-btn class="pink" dark absolute bottom right fab @click="reset">
+```
+``` javascript
+//methods안에 reset method 추가
 reset() {
 	this.current = {memo:''};
 }
 ```
+
 7) 저장
+- 편집창에서 focus를 잃으면 items에 저장
+``` html
+<!-- textarea에 event 추가 -->
+<v-text-field @blur="save" placeholder="새로운 메모를 입력해보세요!" full-width rows="15" v-model="current.memo" textarea></v-text-field>
+```
 ``` javascript
 //모듈 import
+<script>
 import Vue from 'vue'
 import moment from 'moment'
-//event 추가 (textarea)
-@blur="save"
-//save method 생성
+
+export default {
+	~~~생략~~~
+```
+``` javascript
+//methods안에 save method 추가
 save() {
+	//id가 있으면 수정이기 때문에 무시
 	if(this.current.id || !this.current.memo) return;
 	const id = moment().format('YYYYMMDDHHmmssSSS')
 	Vue.set(this.items, id, {
@@ -138,22 +217,24 @@ save() {
 		"datetime": moment().format('YYYY.MM.DD HH:mm:ss')
 	})
 	this.reset()
-	
 }
 ```
 
 8) 삭제
-``` javascript
-// button 추가 (v-list-tile-content 뒤)
+``` html
+<!-- v-list-tile-content 아래에 삭제 버튼을 추가한다. -->
 <v-list-tile-action>
 	<v-icon @click.stop.prevent="remove(item)">delete</v-icon>
 </v-list-tile-action>
-// remove method 추가
+```
+``` javascript
+//methods안에 remove method 추가
 remove(i) {
 	Vue.delete(this.items, i.id)
 	this.reset()
 }
 ```
+![로컬동작 최종본](images/local-last.png)
 
 ## 4. firebase 실시간 DB 사용 <100>
 ### lib/firebase.js 생성
