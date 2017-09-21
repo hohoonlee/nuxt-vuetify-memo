@@ -236,8 +236,15 @@ remove(i) {
 ```
 ![로컬동작 최종본](images/local-last.png)
 
-# 4. firebase 실시간 DB 사용 <100>
-## lib/firebase.js 생성
+# 4. firebase 실시간 DB 사용으로 변경 <100>
+## firebase project 생성
+- [console.firebase.google.com](https://console.firebase.google.com/u/0/)로 접속해서 프로젝트를 생성합니다.
+- Authentication에 들어가서 google login을 활성화 합니다. (이 예제에서는 google login만 사용합니다.)
+
+
+## lib/firebase.js 작업
+- firebase와 연동하기 위한 기본 object들을 정의하는 모듈입니다.
+- lib폴더를 생성하고 그 아래 firebase.js를 아래처럼 생성한다.
 ``` javascript
 import Firebase from 'firebase'
 
@@ -250,23 +257,40 @@ if(!firebaseApp && !Firebase.apps.length) {
 	firebaseApp = Firebase.apps[0];
 }
 
-db		= firebaseApp.database();
+db	= firebaseApp.database();
 auth	= firebaseApp.auth();
 provider= new Firebase.auth.GoogleAuthProvider();
 
 export default {firebaseApp, db, auth, provider}
 ```
-firebase console에서 웹설정을 복사해서 config에 추가한다.
+- firebase console의 Authentication 메뉴에서 웹설정을 클릭해서 나온 화면에서 config값만 복사한다.
+- lib/firebase.js의 config에 추가한다.
+
 ![websetting](images/web-setting.png)
 
 ## 로그인/로그아웃 추가
-1) data에 user추가
+1) layouts/default.vue 소스에서 data에 user추가하고 items을 비워줍니다.
 ``` javascript
-user: {}
+data() {
+	return {
+		clipped: false,
+		drawer: true,
+		fixed: true,
+		items: {},
+		current: { memo: '' },
+		user: {},
+		miniVariant: false,
+		title: '메모앱'
+	}
+}
 ```
-2) 로그아웃 버튼 추가
-``` javascript
-//rightDrawer 버튼 영역을 대체한다.
+2) 로그아웃용 avatar영역 추가
+``` xml
+<!-- 아래의 rightDrawer 영역을 -->
+<v-btn icon @click.stop="rightDrawer = !rightDrawer">
+	<v-icon>menu</v-icon>
+</v-btn>
+<!-- 아래의 avatar btn으로 대체한다. -->
 <v-btn icon v-if="user.uid" @click="logout">
 	<v-avatar>
 		<img :src="user.photoURL" :alt="user.displayName" />
@@ -274,20 +298,32 @@ user: {}
 </v-btn>
 ```
 3) 로그인 버튼 추가
-``` javascript
-//main 영역의 v-card아래에 추가
-//원래 있는 v-card에는 v-if="user.uid" 추가
+- 로그인 여부에 따라 편집창/로그인버튼으로 표시한다.
+``` xml
+<!-- 편집창 영역 변경 -->
+<v-card v-if="user.uid">
+	<v-text-field @blur="save" placeholder="새로운 메모를 입력해보세요!" full-width rows="15" v-model="current.memo" textarea></v-text-field>
+
+	<v-card-text>
+		<v-btn class="pink" dark absolute bottom right fab @click="reset">
+			<v-icon>add</v-icon>
+		</v-btn>
+	</v-card-text>
+</v-card>
 <v-card v-if="!user.uid">
-	<v-btn large  @click="login">
-		Login <v-icon>assignment_ind</v-icon>
+	<v-btn large @click="login">
+		Login
+		<v-icon>assignment_ind</v-icon>
 	</v-btn>
 </v-card>
 ```
 4) 로그인/로그아웃 method추가
 ``` javascript
-//import
+// 기존 import한 영역에 추가한다.
 import firebase from '../lib/firebase'
-//method추가
+```
+``` javascript
+//methods에 두개의 method를 추가한다.
 login() {
 	firebase.auth.signInWithPopup(firebase.provider)
 },
@@ -297,7 +333,11 @@ logout() {
 },
 ```
 5) 로그인 정보 수신 부분 추가
+- 사용자 로그인 상태가 변경되는 경우 수신한다.
 ``` javascript
+methods() {
+	~~생략~~
+},
 created() {
 	const self = this;
 	firebase.auth.onAuthStateChanged((u)=>{
@@ -308,18 +348,24 @@ created() {
 ```
 ## firebase에서 data 가져오기
 ``` javascript
-//기존 items의 sample data 제거
-items: {},
-//create hook에 data 조회 추가
-const key = 'notes/' + self.user.uid
-firebase.db.ref(key).off('value');
-firebase.db.ref(key).orderByKey().on('value', (snapshot)=>{
-	self.items = snapshot.val();
-});
+//created hook에 data 조회 부분을 추가한다.
+created() {
+		const self = this;
+		firebase.auth.onAuthStateChanged((u) => {
+			if (!u || !u.uid) return self.user = {};
+			self.user = u;
+
+			const key = 'notes/' + self.user.uid
+			firebase.db.ref(key).off('value');
+			firebase.db.ref(key).orderByKey().on('value', (snapshot) => {
+				self.items = snapshot.val();
+			});
+		})
+	}
 ```
 ## firebase에서 저장하기
 ``` javascript
-// save method 변경
+// 기존 save() method를 firebase를 사용하도록 변경한다.
 save() {
 	if(!this.current.memo) return
 	
@@ -343,10 +389,9 @@ save() {
 ```
 ## firebase에서 삭제하기 
 ``` javascript
-// remove method 변경
+// 기존 remove() method를 firebase에서 삭제하도록 변경한다.
 remove(i) {
-	let key = 'notes/' + this.user.uid + '/' + i.id
-	firebase.db.ref(key).remove()
+	firebase.db.ref('notes/' + this.user.uid + '/' + i.id).remove()
 	this.reset()
 }
 ```
@@ -396,7 +441,7 @@ exports.makeUppercase = functions.database.ref('/messages/{pushId}/original').on
 ## firebase 연결 (dist를 연결, function도 선택)
 firebase project에서 function을 초기화한다.
 ``` bash
-# firebase login은 실행했다고 가정
+# firebase login은 실행했다고 가정 안했다면 firebase login실행.
 $ firebase init
 ~~~~~~~~
 ? Which Firebase CLI features do you want to setup for this folder? Press Space to select features, then Enter to confirm your choices.

@@ -11,4 +11,6 @@
 # Nuxt generate
 **/dist
 
-memo-project
+# firebase
+.firebaserc
+firebase.json
