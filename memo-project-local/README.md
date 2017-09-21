@@ -1,4 +1,4 @@
-# memo-project
+# memo-project-local
 
 > memo app example
 

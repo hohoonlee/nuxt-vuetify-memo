@@ -50,7 +50,7 @@ $ npm run dev # or yarn run dev
 ## layouts/default.vue 편집 (이 파일 하나에서 모든 동작이 수행됩니다.)
 1) 불필요한 영역 제거
 ``` xml
-// 59라인에서 72라인까지의 아래 소스를 제거한다.
+<!-- 59라인에서 72라인까지의 아래 소스를 제거한다. -->
 <v-navigation-drawer
 	temporary
 	:right="right"
@@ -65,7 +65,7 @@ $ npm run dev # or yarn run dev
 	</v-list-tile>
 	</v-list>
 </v-navigation-drawer>
-// 26라인에서 44라인까지의 아래 소스를 제거한다.
+<!-- 26라인에서 44라인까지의 아래 소스를 제거한다. -->
 <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
 <v-btn
 icon
@@ -236,8 +236,8 @@ remove(i) {
 ```
 ![로컬동작 최종본](images/local-last.png)
 
-## 4. firebase 실시간 DB 사용 <100>
-### lib/firebase.js 생성
+# 4. firebase 실시간 DB 사용 <100>
+## lib/firebase.js 생성
 ``` javascript
 import Firebase from 'firebase'
 
@@ -259,7 +259,7 @@ export default {firebaseApp, db, auth, provider}
 firebase console에서 웹설정을 복사해서 config에 추가한다.
 ![websetting](images/web-setting.png)
 
-### 로그인/로그아웃 추가
+## 로그인/로그아웃 추가
 1) data에 user추가
 ``` javascript
 user: {}
@@ -306,7 +306,7 @@ created() {
 	})
 }
 ```
-### firebase에서 data 가져오기
+## firebase에서 data 가져오기
 ``` javascript
 //기존 items의 sample data 제거
 items: {},
@@ -317,7 +317,7 @@ firebase.db.ref(key).orderByKey().on('value', (snapshot)=>{
 	self.items = snapshot.val();
 });
 ```
-### firebase에서 저장하기
+## firebase에서 저장하기
 ``` javascript
 // save method 변경
 save() {
@@ -341,7 +341,7 @@ save() {
 	this.reset()
 }
 ```
-### firebase에서 삭제하기 
+## firebase에서 삭제하기 
 ``` javascript
 // remove method 변경
 remove(i) {
@@ -351,8 +351,8 @@ remove(i) {
 }
 ```
 
-## 5. firebase function 사용 <130>
-### 설명
+# 5. firebase function 사용 <130>
+## 설명
 * event가 발생하면 특정 function을 실행한다.
 * event에는 CloudEvent와 HttpsEvent로 구분된다.
 * Analytics (event -> onLog)
@@ -393,7 +393,7 @@ exports.makeUppercase = functions.database.ref('/messages/{pushId}/original').on
 });
 ```
 
-### firebase 연결 (dist를 연결, function도 선택)
+## firebase 연결 (dist를 연결, function도 선택)
 firebase project에서 function을 초기화한다.
 ``` bash
 # firebase login은 실행했다고 가정
