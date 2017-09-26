@@ -1,23 +1,42 @@
 nuxt-vuetify-memo
 =================
-아래와 같은 app을 만드는 codelab
+> 스터디 : JS기초 -> ES6 -> VueJS -> **Firebase** -> ...
+> 아래와 같은 app을 만드는 codelab
 ![완성화면](images/goal.png)
 # 1. 기본 환경 설정 <2>
+> NodeJS (필수)
 ``` bash
 $ node -v
-# macOS : brew install node 추천
-# linux : https://github.com/creationix/nvm 추천 (nvm install 8.5.0)
-# windows : https://github.com/coreybutler/nvm-windows/releases latest release의 nvm-setup.zip 추천 (nvm install 8.5.0 -> nvm use 8.5.0)
 $ npm -v 
-# yarn -v (npm i -g yarn) : 옵션
+```
+- macOS : brew install node 추천
+- linux : https://github.com/creationix/nvm 추천 (nvm install 8.5.0)
+- windows : https://github.com/coreybutler/nvm-windows/releases latest release의 nvm-setup.zip 추천 (nvm install 8.5.0 -> nvm use 8.5.0)
+
+> Firebase Tools (필수)
+``` bash
 $ firebase --version 
 # 없으면 npm i -g firebase-tools
+```
+
+> Vue cli (필수)
+``` bash
 $ vue --version 
 # 없으면 npm i -g vue-cli
-# vs code 와 vetur plugin 설치되어 있으면 좋음
-# vs code :  https://code.visualstudio.com/Download or brew cask install visual-studio-code
 ```
-tip: npm-check가 설치되어 있으면 upgrade를 체크해줌.
+
+> yarn (옵션)
+``` bash
+$ yarn -v 
+# 없으면 npm i -g yarn
+```
+
+> Visual Studio Code (옵션)
+- download : [https://code.visualstudio.com/Download](https://code.visualstudio.com/Download)
+- macOS : brew cask install visual-studio-code
+- 추가 plugin vetur 설치
+
+>tip: npm-check가 설치되어 있으면 upgrade를 체크해줌.
 ``` bash
 $ npm-check -gu 
 # 없으면 npm i -g npm-check
@@ -25,10 +44,10 @@ $ npm-check -gu
 
 # 2. 프로젝트 생성 (nuxt) <15>
 ## > nuxtjs + vuetify project 만들기
-vue-cli를 사용하여 [Nuxt.js](https://ko.nuxtjs.org) + [Vuetify.js](https://vuetifyjs.com/) 를 생성한다.
+> vue-cli를 사용하여 [Nuxt.js](https://ko.nuxtjs.org) + [Vuetify.js](https://vuetifyjs.com/) 를 생성한다.
 (이 예제에서는 route, store등의 기능을 사용하지 않는다.)
 
-아래 명령어를 실행하여 프로젝트 생성 및 기본 화면을 확인한다.
+> 아래 명령어를 실행하여 프로젝트 생성 및 기본 화면을 확인한다.
 ``` bash
 $ vue init vuetifyjs/nuxt memo-project
 # project name, project description, Author는 자유롭게 입력. 
@@ -42,7 +61,7 @@ $ npm run dev # or yarn run dev
 ![기본페이지](images/default-page.png)
 
 ## > nuxt.config.js 수정
-작성자 코딩스타일과 맞지 않아 기본 ESLINT 부분을 제거합니다. 
+> 작성자 코딩스타일과 맞지 않아 기본 ESLINT 부분을 제거합니다. 
 (제거 없이 규칙을 수정하거나, 규약에 맞춰 개발할 수도 있습니다.)
 ``` javascript
 if (ctx.dev && ctx.isClient) {
@@ -57,7 +76,7 @@ if (ctx.dev && ctx.isClient) {
 
 # 3. 순수 로컬에서 실행되는 앱 <50>
 ## layouts/default.vue 편집 (이 파일 하나에서 모든 동작이 수행됩니다.)
-1) 불필요한 영역 제거
+> 1) 불필요한 영역 제거
 ``` xml
 <!-- 59라인에서 72라인까지의 아래 소스를 제거한다. (오늘쪽 메뉴 영역) -->
 <v-navigation-drawer
@@ -96,7 +115,7 @@ if (ctx.dev && ctx.isClient) {
 </v-btn>
 ```
 
-2) 사용할 data format 정의
+> 2) 사용할 data format 정의
 ``` javascript
 // 배열 data 형식을 firebase realtime database처럼 object형태로 변경합니다.
 // 현제 선택된 item을 표현할 current를 추가합니다.
@@ -118,7 +137,7 @@ export default {
 }
 ```
 
-3) 왼쪽 data 목록 영역을 바뀐 items에 맞게 변경.
+> 3) 왼쪽 data 목록 영역을 바뀐 items에 맞게 변경.
 ``` html
 <!--
 v-navigation-drawer 에 permanent 속성 추가.
@@ -142,7 +161,7 @@ v-list-tile-title 밑에 <v-list-tile-sub-title v-text="item.datetime"></v-list-
 </v-navigation-drawer>
 ```
 
-4) 편집영역 추가
+> 4) 편집영역 추가
 ``` html
 <!--
 <nuxt />를 제거하고 아래 소스를 추가한다.
@@ -163,7 +182,7 @@ v-list-tile-title 밑에 <v-list-tile-sub-title v-text="item.datetime"></v-list-
 ```
 ![중간결과](images/local-step1.png)
 
-5) 상세보기
+> 5) 상세 보기 기능 작업
 
 - 왼쪽 영역 클릭시 가운데 편집창에 반영되는 기능을 추가한다. (vue의 bind로 수정도 적용됩니다.)
 ``` html
@@ -184,8 +203,7 @@ export default {
 }
 ```
 
-6) 새글쓰기
-
+> 6) 새글 기능 작업
 - 편집창안에 글을 지우고 새글을 받을 준비를 합니다.
 ``` html
 <!-- textare 편집창 아래의 pink btn에  event 추가 -->
@@ -198,7 +216,7 @@ reset() {
 }
 ```
 
-7) 저장
+> 7) 저장 기능 작업
 - 편집창에서 focus를 잃으면 items에 저장
 ``` html
 <!-- textarea에 event 추가 -->
@@ -229,7 +247,7 @@ save() {
 }
 ```
 
-8) 삭제
+> 8) 삭제 기능 작업
 ``` html
 <!-- v-list-tile-content 아래에 삭제 버튼을 추가한다. -->
 <v-list-tile-action>
@@ -247,13 +265,13 @@ remove(i) {
 
 # 4. firebase 실시간 DB 사용으로 변경 <100>
 ## firebase project 생성
-- [console.firebase.google.com](https://console.firebase.google.com/u/0/)로 접속해서 프로젝트를 생성합니다.
-- Authentication에 들어가서 google login을 활성화 합니다. (이 예제에서는 google login만 사용합니다.)
+> [console.firebase.google.com](https://console.firebase.google.com/u/0/)로 접속해서 프로젝트를 생성합니다.
+> Authentication에 들어가서 google login을 활성화 합니다. (이 예제에서는 google login만 사용합니다.)
 
 
 ## lib/firebase.js 작업
-- firebase와 연동하기 위한 기본 object들을 정의하는 모듈입니다.
-- lib폴더를 생성하고 그 아래 firebase.js를 아래처럼 생성한다.
+> firebase와 연동하기 위한 기본 object들을 정의하는 모듈입니다.
+> lib폴더를 생성하고 그 아래 firebase.js를 아래처럼 생성한다.
 ``` javascript
 import Firebase from 'firebase'
 
@@ -278,7 +296,7 @@ export default {firebaseApp, db, auth, provider}
 ![websetting](images/web-setting.png)
 
 ## 로그인/로그아웃 추가
-1) layouts/default.vue 소스에서 data에 user추가하고 items을 비워줍니다.
+> 1) layouts/default.vue 소스에서 data에 user추가하고 items을 비워줍니다.
 ``` javascript
 data() {
 	return {
@@ -293,7 +311,8 @@ data() {
 	}
 }
 ```
-2) 로그아웃용 avatar영역 추가
+
+> 2) 로그아웃용 avatar영역 추가
 ``` xml
 <!-- 아래의 rightDrawer 영역을 -->
 <v-btn icon @click.stop="rightDrawer = !rightDrawer">
@@ -306,7 +325,8 @@ data() {
 	</v-avatar>
 </v-btn>
 ```
-3) 로그인 버튼 추가
+
+> 3) 로그인 버튼 추가
 - 로그인 여부에 따라 편집창/로그인버튼으로 표시한다.
 ``` xml
 <!-- 편집창 영역 변경 -->
@@ -326,7 +346,8 @@ data() {
 	</v-btn>
 </v-card>
 ```
-4) 로그인/로그아웃 method추가
+
+> 4) 로그인/로그아웃 method추가
 ``` javascript
 // 기존 import한 영역에 추가한다.
 import firebase from '../lib/firebase'
@@ -341,7 +362,8 @@ logout() {
 	firebase.auth.signOut();
 },
 ```
-5) 로그인 정보 수신 부분 추가
+
+> 5) 로그인 정보 수신 부분 추가
 - 사용자 로그인 상태가 변경되는 경우 수신한다.
 ``` javascript
 methods() {
@@ -355,6 +377,7 @@ created() {
 	})
 }
 ```
+
 ## firebase에서 data 가져오기
 ``` javascript
 //created hook에 data 조회 부분을 추가한다.
@@ -372,6 +395,7 @@ created() {
 	})
 }
 ```
+
 ## firebase에서 저장하기
 ``` javascript
 // 기존 save() method를 firebase를 사용하도록 변경한다.
@@ -396,6 +420,7 @@ save() {
 	this.reset()
 }
 ```
+
 ## firebase에서 삭제하기 
 ``` javascript
 // 기존 remove() method를 firebase에서 삭제하도록 변경한다.
@@ -448,7 +473,7 @@ exports.makeUppercase = functions.database.ref('/messages/{pushId}/original').on
 ```
 
 ## firebase 연결 (dist를 연결, function도 선택)
-firebase project에서 function을 초기화한다.
+> firebase project에서 function을 초기화한다.
 ``` bash
 # firebase login은 실행했다고 가정 안했다면 firebase login실행.
 $ firebase init
@@ -483,12 +508,12 @@ have a build process for your assets, use your build's output directory.
 ? What do you want to use as your public directory? (public) dist
 ? Configure as a single-page app (rewrite all urls to /index.html)? (y/N) N
 ```
-functions 의 helloworld 작업
+
+>functions 의 helloworld 작업
 - 생성된 functions의 index.js를 열어 코드의 주석을 해제한다.
 
-firebase에 deloy
+>firebase에 deloy
 ``` bash
-
 # hosting 및 functions 배포
 $ firebase deploy
 ~~~~~~~~
@@ -498,7 +523,8 @@ Project Console: https://console.firebase.google.com/project/abcd-memo-3a2f9/ove
 Hosting URL: https://abcd-memo-3a2f9.firebaseapp.com
 Function URL (helloWorld): https://us-central1-abcd-memo-3a2f9.cloudfunctions.net/helloWorld
 ```
-functions/index.js 수정
+
+> functions/index.js 수정
 ``` javascript
 const functions = require('firebase-functions')
 const admin 	= require('firebase-admin')
@@ -521,7 +547,7 @@ exports.select = functions.https.onRequest((req, res) => {
 // log 확인
 ```
 
-Google Sheet 사용하기
+> Google Sheet 사용하기
 - google 개발 console로 이동 [https://console.developers.google.com](https://console.developers.google.com)
 - 프로젝트 선택
 - 라이브러리로 이동하여 Google Sheets API를 검색하여 사용 설정.
@@ -615,11 +641,13 @@ exports.createMemo = functions.database.ref('/notes/{uid}/{key}').onCreate(memoH
 exports.updateMemo = functions.database.ref('/notes/{uid}/{key}').onUpdate(memoHandler);
 exports.deleteMemo = functions.database.ref('/notes/{uid}/{key}').onDelete(memoHandler);
 ```
-functions만 배포
+
+> functions만 배포
 ``` bash
 $ firebase deploy --only functions
 ```
-전체 배포
+
+> 전체 배포
 ``` bash
 $ npm run generate # yarn generate
 $ firebase deploy

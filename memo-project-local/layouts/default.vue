@@ -4,7 +4,7 @@
 			<v-list>
 				<v-list-tile v-for="(item, i) in items" :key="i" @click.stop.prevent="detail(item)">
 					<v-list-tile-action>
-						<v-icon v-bind:class="{'orange--text':item.id==current.id}" v-html="item.icon"></v-icon>
+						<v-icon :class="{'orange--text':item.id==current.id}" v-html="item.icon"></v-icon>
 					</v-list-tile-action>
 					<v-list-tile-content>
 						<v-list-tile-title v-text="item.memo"></v-list-tile-title>
