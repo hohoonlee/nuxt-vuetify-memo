@@ -6,19 +6,21 @@ nuxt-vuetify-memo
 ``` bash
 $ node -v
 # macOS : brew install node 추천
-# linux : https://github.com/creationix/nvm 추천
-# windows : https://github.com/coreybutler/nvm-windows/releases latest release의 nvm-setup.zip 추천
-$ npm -v #yarn -v
+# linux : https://github.com/creationix/nvm 추천 (nvm install 8.5.0)
+# windows : https://github.com/coreybutler/nvm-windows/releases latest release의 nvm-setup.zip 추천 (nvm install 8.5.0 -> nvm use 8.5.0)
+$ npm -v 
+# yarn -v (npm i -g yarn) : 옵션
 $ firebase --version 
-#없으면 npm i -g firebase-tools
+# 없으면 npm i -g firebase-tools
 $ vue --version 
-#없으면 npm i -g vue-cli
+# 없으면 npm i -g vue-cli
 # vs code 와 vetur plugin 설치되어 있으면 좋음
 # vs code :  https://code.visualstudio.com/Download or brew cask install visual-studio-code
 ```
 tip: npm-check가 설치되어 있으면 upgrade를 체크해줌.
 ``` bash
-$ npm-check -gu #없으면 npm i -g npm-check
+$ npm-check -gu 
+# 없으면 npm i -g npm-check
 ```
 
 # 2. 프로젝트 생성 (nuxt) <15>
@@ -40,54 +42,55 @@ $ npm run dev # or yarn run dev
 ![기본페이지](images/default-page.png)
 
 ## > nuxt.config.js 수정
-작성자 코딩스타일과 맞지 않아 기본 ESLINT 부분을 제거합니다. (제거 없이 규칙을 수정하거나, 규약에 맞춰 개발할 수도 있습니다.)
+작성자 코딩스타일과 맞지 않아 기본 ESLINT 부분을 제거합니다. 
+(제거 없이 규칙을 수정하거나, 규약에 맞춰 개발할 수도 있습니다.)
 ``` javascript
-//if (ctx.dev && ctx.isClient) {
+if (ctx.dev && ctx.isClient) {
 //	config.module.rules.push({
 //   	enforce: 'pre',
 //        test: /\.(js|vue)$/,
 //        loader: 'eslint-loader',
 //        exclude: /(node_modules)/
 //    })
-//}
+}
 ```
 
 # 3. 순수 로컬에서 실행되는 앱 <50>
 ## layouts/default.vue 편집 (이 파일 하나에서 모든 동작이 수행됩니다.)
 1) 불필요한 영역 제거
 ``` xml
-<!-- 59라인에서 72라인까지의 아래 소스를 제거한다. -->
+<!-- 59라인에서 72라인까지의 아래 소스를 제거한다. (오늘쪽 메뉴 영역) -->
 <v-navigation-drawer
 	temporary
 	:right="right"
 	v-model="rightDrawer"
 >
 	<v-list>
-	<v-list-tile @click="right = !right">
-		<v-list-tile-action>
-		<v-icon light>compare_arrows</v-icon>
-		</v-list-tile-action>
-		<v-list-tile-title>Switch drawer (click me)</v-list-tile-title>
-	</v-list-tile>
+		<v-list-tile @click="right = !right">
+			<v-list-tile-action>
+			<v-icon light>compare_arrows</v-icon>
+			</v-list-tile-action>
+			<v-list-tile-title>Switch drawer (click me)</v-list-tile-title>
+		</v-list-tile>
 	</v-list>
 </v-navigation-drawer>
-<!-- 26라인에서 44라인까지의 아래 소스를 제거한다. -->
+<!-- 26라인에서 44라인까지의 아래 소스를 제거한다. (메뉴 상단의 아이콘과 버튼) -->
 <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
 <v-btn
-icon
-@click.stop="miniVariant = !miniVariant"
+	icon
+	@click.stop="miniVariant = !miniVariant"
 >
 	<v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
 </v-btn>
 <v-btn
-icon
-@click.stop="clipped = !clipped"
+	icon
+	@click.stop="clipped = !clipped"
 >
 	<v-icon>web</v-icon>
 </v-btn>
 <v-btn
-icon
-@click.stop="fixed = !fixed"
+	icon
+	@click.stop="fixed = !fixed"
 >
 	<v-icon>remove</v-icon>
 </v-btn>
@@ -356,18 +359,18 @@ created() {
 ``` javascript
 //created hook에 data 조회 부분을 추가한다.
 created() {
-		const self = this;
-		firebase.auth.onAuthStateChanged((u) => {
-			if (!u || !u.uid) return self.user = {};
-			self.user = u;
+	const self = this;
+	firebase.auth.onAuthStateChanged((u) => {
+		if (!u || !u.uid) return self.user = {};
+		self.user = u;
 
-			const key = 'notes/' + self.user.uid
-			firebase.db.ref(key).off('value');
-			firebase.db.ref(key).orderByKey().on('value', (snapshot) => {
-				self.items = snapshot.val();
-			});
-		})
-	}
+		const key = 'notes/' + self.user.uid
+		firebase.db.ref(key).off('value');
+		firebase.db.ref(key).orderByKey().on('value', (snapshot) => {
+			self.items = snapshot.val();
+		});
+	})
+}
 ```
 ## firebase에서 저장하기
 ``` javascript
