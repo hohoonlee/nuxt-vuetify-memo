@@ -7,7 +7,7 @@ nuxt-vuetify-memo
 $ node -v
 # macOS : brew install node 추천
 # linux : https://github.com/creationix/nvm 추천
-# windows : hhttps://github.com/coreybutler/nvm-windows/releases latest release의 nvm-setup.zip 추천
+# windows : https://github.com/coreybutler/nvm-windows/releases latest release의 nvm-setup.zip 추천
 $ npm -v #yarn -v
 $ firebase --version 
 #없으면 npm i -g firebase-tools
