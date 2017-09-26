@@ -5,10 +5,16 @@ nuxt-vuetify-memo
 # 1. 기본 환경 설정 <2>
 ``` bash
 $ node -v
+# macOS : brew install node 추천
+# linux : https://github.com/creationix/nvm 추천
+# windows : hhttps://github.com/coreybutler/nvm-windows/releases latest release의 nvm-setup.zipㅍ 추천
 $ npm -v #yarn -v
-$ firebase --version #없으면 npm i -g firebase-tools
-$ vue --version #없으면 npm i -g vue-cli
+$ firebase --version 
+#없으면 npm i -g firebase-tools
+$ vue --version 
+#없으면 npm i -g vue-cli
 # vs code 와 vetur plugin 설치되어 있으면 좋음
+# vs code :  https://code.visualstudio.com/Download or brew cask install visual-studio-code
 ```
 tip: npm-check가 설치되어 있으면 upgrade를 체크해줌.
 ``` bash
