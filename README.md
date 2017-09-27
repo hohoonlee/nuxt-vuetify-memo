@@ -1,6 +1,7 @@
 nuxt-vuetify-memo
 =================
 > 스터디 : JS기초 -> ES6 -> VueJS -> **Firebase** -> ...
+
 > 아래와 같은 app을 만드는 codelab
 ![완성화면](images/goal.png)
 # 1. 기본 환경 설정 <2>
@@ -62,7 +63,7 @@ $ npm run dev # or yarn run dev
 
 ## > nuxt.config.js 수정
 > 작성자 코딩스타일과 맞지 않아 기본 ESLINT 부분을 제거합니다. 
-(제거 없이 규칙을 수정하거나, 규약에 맞춰 개발할 수도 있습니다.)
+> (제거 없이 규칙을 수정하거나, 규약에 맞춰 개발할 수도 있습니다.)
 ``` javascript
 if (ctx.dev && ctx.isClient) {
 //	config.module.rules.push({
