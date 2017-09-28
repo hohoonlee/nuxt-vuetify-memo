@@ -553,11 +553,11 @@ exports.select = functions.https.onRequest((req, res) => {
 - 프로젝트 선택
 - 라이브러리로 이동하여 Google Sheets API를 검색하여 사용 설정.
 ![api 활성화](images/a.png)
-- 사용자 인증 정보 > OAuth 2.0 클라이언트 ID 선택 후 'https://developers.google.com/oauthplayground/' 추가 & 'JSON다운로드' 실행
+- 사용자 인증 정보 > OAuth 2.0 클라이언트 ID 선택 후 'https://developers.google.com/oauthplayground' 추가 & 'JSON다운로드' 실행
 ![사용자 인증 정보](images/b.png)
 ![JSON 다운로드](images/json.png)
 - 다운 받은 json 파일을 functions 디렉토리에 auth_key.json으로 저장한다.
-- [https://developers.google.com/oauthplayground/](https://developers.google.com/oauthplayground/)오픈
+- [https://developers.google.com/oauthplayground](https://developers.google.com/oauthplayground)오픈
 ![playground](images/playground.png)
 ![playground1](images/playground1.png)
 ![playground2](images/playground2.png)
