@@ -296,6 +296,9 @@ export default {firebaseApp, db, auth, provider}
 
 ![websetting](images/web-setting.png)
 
+- firebase의 Authentication의 로그인 방법 중 google 로그인을 활성화 한다.
+![loginsetting](images/firebase-login.png)
+
 ## 로그인/로그아웃 추가
 > 1) layouts/default.vue 소스에서 data에 user추가하고 items을 비워줍니다.
 ``` javascript
